@@ -9,11 +9,10 @@ nltk.download('punkt')
 #get_url = "https://en.wikipedia.org/wiki/Readability"
 
 
-def text_complexity(url):
+def text_complexity(response):
 
     list1=[]
     count_difficult_word = 0
-    response = requests.get(url)
     soup = BeautifulSoup(response.text, 'html.parser')
     text = soup.get_text(strip=True, separator="\n")
 
