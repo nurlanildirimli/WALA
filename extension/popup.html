@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1000px, initial-scale=1.0">
+    <title>WALA</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href = "popup.css" rel="stylesheet">
+  </head>
+<body>
+  <div> 
+  <h1>WALA</h1>
+  <h4> (Web Accessbillity Tool for Autism) </h4>
+  </div>
+  <hr>
+  <label>Please check the required metrics: </label>
+  <br><br>
+  <input type="checkbox" id="visualcomp" name="visualcomp" value="true" class="form-check-input">
+  <label for="visualcomp" styleclass="form-check-label"> Visual Complexity</label><br>
+
+  <input type="checkbox" id="distin" name="distin" value="true" class="form-check-input">
+  <label for="distin" class="form-check-label"> Distinguishability</label><br>
+
+  <input type="checkbox" id="text-image" name="text-image" value="true" class="form-check-input">
+  <label for="text-image" class="form-check-label"> Text-Image Ratio</label><br>
+
+  <input type="checkbox" id="textc" name="textc" style="margin-right: 8px" value="true" class="form-check-input">
+  <label for="textc" class="form-check-label"> Text Complexity</label><br>
+
+  <input type="checkbox" id="image" name="image" value="true" style="margin-left:10px" class="form-check-input">
+  <label for="image" class="form-check-label"> Image Complexity</label><br>
+  <br>
+  <button id="convert" class="btn btn-primary custom-bg text-white"> Scan Webpage</button>
+  <br><br>
+  <div id="output"></div>
+  <div id="output1">  </div>
+  <br>
+  <div class="spinner-border mb-5" role="status"> </div>
+  <script src="popup.js"></script>
+  <script src="jquery-3.7.1.min.js"></script>
+</head>
+</body>
+</html>
