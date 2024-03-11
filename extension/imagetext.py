@@ -1,10 +1,10 @@
 import requests
 from bs4 import BeautifulSoup
 
-def calculate_image_text_ratio(url):
+def calculate_image_text_ratio(response):
     try:
         # Fetch the HTML content of the webpage
-        response = requests.get(url)
+       
         response.raise_for_status()  # Raise an exception for bad responses (4xx or 5xx)
         
         # Parse the HTML content
@@ -31,3 +31,4 @@ def calculate_image_text_ratio(url):
    # print(f"Image-to-text ratio for {url}: {ratio}")
 #else:
     #print("Failed to calculate image-to-text ratio.")
+
