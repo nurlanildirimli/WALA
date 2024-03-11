@@ -5,6 +5,8 @@ import imagetext as it
 import vicramcalc as vc
 import whitespace as ws
 import imagecalc as im
+import imagemain as imm
+import requests
 
 app = Flask(__name__) 
 
@@ -30,6 +32,7 @@ def Scan():
    textc = request.args.get('data5')
    image = request.args.get('data6')
    print("DATAA",url,visualcomp,distin,text_image,textc,image)
+   response = requests.get(url)
    
    if visualcomp == "true":
        result["Visual Complexity"]=vc.vicramcalc1("example_role",url)
@@ -40,16 +43,15 @@ def Scan():
    else:
        result["Distinguishablity"]="NA"
    if text_image == "true":
-       result["Text Image Ratio"]=it.calculate_image_text_ratio(url)
+       result["Text Image Ratio"]=it.calculate_image_text_ratio(response)
    else:
        result["Text Image Ratio"]="NA"
    if textc == "true":
-       result["Text Complexity"]=tx.text_complexity(url)
+       result["Text Complexity"]=tx.text_complexity(response)
    else:
        result["Text Complexity"]="NA"
    if image == "true":
-       pass
-       result["Image Complexity"]="0.60"
+       result["Image Complexity"]=im.calculate_image(response,url)
    else:
        result["Image Complexity"]="NA"
 
