@@ -1,5 +1,6 @@
 from flask import Flask, jsonify,render_template, request 
 from flask_cors import CORS
+import threading
 import textcomp as tx
 import imagetext as it
 import vicramcalc as vc
@@ -20,7 +21,7 @@ def hello():
 def Scan():
    result = {
        "Visual Complexity": 0,
-       "Distinguishablity": 0,
+       "Distinguishability": 0,
        "Text Image Ratio": 0,
        "Text Complexity": 0,
        "Image Complexity": 0,
@@ -34,49 +35,56 @@ def Scan():
    print("DATAA",url,visualcomp,distin,text_image,textc,image)
    response = requests.get(url)
    
-   if visualcomp == "true":
-       result["Visual Complexity"]=vc.vicramcalc1("example_role",url)
-   else:
-       result["Visual Complexity"]="NA"
-   if distin == "true":
-       result["Distinguishablity"]=ws.vicramcalc("example_role",url)
-   else:
-       result["Distinguishablity"]="NA"
-   if text_image == "true":
-       result["Text Image Ratio"]=it.calculate_image_text_ratio(response)
-   else:
-       result["Text Image Ratio"]="NA"
-   if textc == "true":
-       result["Text Complexity"]=tx.text_complexity(response)
-   else:
-       result["Text Complexity"]="NA"
-   if image == "true":
-       result["Image Complexity"]=im.calculate_image(response,url)
-   else:
-       result["Image Complexity"]="NA"
+   def calculate_visual_complexity():
+        if visualcomp == "true":
+            result["Visual Complexity"]=vc.vicramcalc1("example_role",url)
+        else:
+            result["Visual Complexity"]="NA"
+
+   def calculate_distinguishability():
+        if distin == "true":
+            result["Distinguishablity"]=ws.vicramcalc("example_role",url)
+        else:
+            result["Distinguishability"]="NA"
+
+   def calculate_text_image_ratio():
+        if text_image == "true":
+            result["Text Image Ratio"]=it.calculate_image_text_ratio(response)
+        else:
+            result["Text Image Ratio"]="NA"
+
+   def calculate_text_complexity():
+        if textc == "true":
+            result["Text Complexity"]=tx.text_complexity(response)
+        else:
+            result["Text Complexity"]="NA"
+
+   def calculate_image_complexity():
+        if image == "true":
+            result["Image Complexity"]=im.calculate_image(response,url)
+        else:
+            result["Image Complexity"]="NA"
+
+   threads = []
+   threads.append(threading.Thread(target=calculate_visual_complexity))
+   threads.append(threading.Thread(target=calculate_distinguishability))
+   threads.append(threading.Thread(target=calculate_text_image_ratio))
+   threads.append(threading.Thread(target=calculate_text_complexity))
+   threads.append(threading.Thread(target=calculate_image_complexity))
+
+    # Start Threads
+   for thread in threads:
+        thread.start()
+
+    # Wait Threads
+   for thread in threads:
+        thread.join()
 
    #return jsonify({'message': f'Data received: {result}'})
    return jsonify(result)
-   '''res = ""
-   data = request.get_json()
-
-   result1=data
-   print(tx.text_complexity(result1[0]))
-   data.extend(tx.text_complexity(result1[0]))
-   #data = jsonify(data)
-   print(result1)
-   for x in result1:
-       res += str(x) + ";"
-   abc="aaaaa"
-   data1 = {
-        "message" : res,
-        "id" : "11",
-    }
-   return jsonify(res)'''
 
    
 if __name__ == '__main__': 
     app.run(debug=True) 
-
-
-    # get methods as shown in cng 445
+    
+    # get methods as shown in CNG 445
