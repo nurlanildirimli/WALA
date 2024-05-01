@@ -7,6 +7,7 @@ import vicramcalc as vc
 import whitespace as ws
 import imagecalc as im
 import imagemain as imm
+import crawler as cw
 import requests
 
 app = Flask(__name__) 
@@ -32,45 +33,79 @@ def Scan():
    text_image = request.args.get('data4')
    textc = request.args.get('data5')
    image = request.args.get('data6')
-   print("DATAA",url,visualcomp,distin,text_image,textc,image)
-   response = requests.get(url)
    
-   def calculate_visual_complexity():
-        if visualcomp == "true":
-            result["Visual Complexity"]=vc.vicramcalc1("example_role",url)
-        else:
-            result["Visual Complexity"]="NA"
+   print("DATAA",url,visualcomp,distin,text_image,textc,image)
 
-   def calculate_distinguishability():
-        if distin == "true":
-            result["Distinguishablity"]=ws.vicramcalc("example_role",url)
-        else:
-            result["Distinguishability"]="NA"
+   inner_urls=cw.crawler(url)
+   inner_urls.insert(0,url)
 
-   def calculate_text_image_ratio():
-        if text_image == "true":
-            result["Text Image Ratio"]=it.calculate_image_text_ratio(response)
-        else:
-            result["Text Image Ratio"]="NA"
-
-   def calculate_text_complexity():
-        if textc == "true":
-            result["Text Complexity"]=tx.text_complexity(response)
-        else:
-            result["Text Complexity"]="NA"
-
-   def calculate_image_complexity():
-        if image == "true":
-            result["Image Complexity"]=im.calculate_image(response,url)
-        else:
-            result["Image Complexity"]="NA"
-
+   def calculate_visual_complexity(url, vis, index):
+        out = vc.vicramcalc1("example_role",url)
+        vis[index-1] = out
+        if index == 1:
+            result["Visual Complexity"]= out
+            
+   def calculate_distinguishability(url, dist, index):
+        out = ws.vicramcalc("example_role",url)
+        dist[index-1] = out
+        if index == 1:
+            result["Distinguishablity"]=out
+            
+   def calculate_text_image_ratio(response, te_im, index):
+        out = it.calculate_image_text_ratio(response)
+        te_im[index-1] = out
+        if index == 1:
+            result["Text Image Ratio"]= out
+            
+   def calculate_text_complexity(response, tex, index):
+        out = tx.text_complexity(response)
+        tex[index-1] = out
+        if index == 1:
+            result["Text Complexity"]= out
+            
+   def calculate_image_complexity(url, response, ima, index):   
+        out = im.calculate_image(response,url)
+        ima[index-1] = out
+        if index == 1:
+            result["Image Complexity"]= out
+            
+   index = 0
+   if visualcomp == "true": vis = [0] * len(inner_urls)
+   else: vis = []
+   if distin == "true": dist = [0] * len(inner_urls)
+   else: dist = []
+   if text_image == "true": te_im = [0] * len(inner_urls)
+   else: te_im = []
+   if textc == "true": tex = [0] * len(inner_urls)
+   else: tex = []
+   if image == "true": ima = [0] * len(inner_urls)
+   else: ima = []
    threads = []
-   threads.append(threading.Thread(target=calculate_visual_complexity))
-   threads.append(threading.Thread(target=calculate_distinguishability))
-   threads.append(threading.Thread(target=calculate_text_image_ratio))
-   threads.append(threading.Thread(target=calculate_text_complexity))
-   threads.append(threading.Thread(target=calculate_image_complexity))
+   for inner_url in inner_urls:  
+        index = index + 1
+        if text_image == "true" or textc == "true" or image == "true":
+            response = requests.get(inner_url)
+        if visualcomp == "true":
+            threads.append(threading.Thread(target=calculate_visual_complexity,args=(inner_url,vis,index)))
+        if distin == "true":
+            threads.append(threading.Thread(target=calculate_distinguishability,args=(inner_url,dist,index)))
+        if text_image == "true":
+            threads.append(threading.Thread(target=calculate_text_image_ratio,args=(response,te_im,index)))
+        if textc == "true":
+            threads.append(threading.Thread(target=calculate_text_complexity,args=(response,tex,index)))
+        if image == "true":
+            threads.append(threading.Thread(target=calculate_image_complexity,args=(inner_url,response,ima,index)))
+   
+   if visualcomp == "false":
+        result["Visual Complexity"]="NA"
+   if distin == "false":
+        result["Distinguishability"]="NA"
+   if text_image == "false":
+        result["Text Image Ratio"]="NA"
+   if textc == "false":
+        result["Text Complexity"]="NA"
+   if image == "false":
+        result["Image Complexity"]="NA"
 
     # Start Threads
    for thread in threads:
